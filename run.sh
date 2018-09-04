@@ -73,7 +73,7 @@ then
 
     if [ "$2" = runtest ]
     then
-        make test
+        make test -j8
         make runtest
     fi
 

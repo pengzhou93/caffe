@@ -421,6 +421,7 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
+optional PermutohedralParameter permutohedral_param = 149;optional PixelFeatureParameter pixel_feature_param = 150;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1446,4 +1447,73 @@ message PReLUParameter {
   optional FillerParameter filler = 1;
   // Whether or not slope parameters are shared across channels.
   optional bool channel_shared = 2 [default = false];
+}
+// Message that stores parameters used by PermutohedralLayer
+message PermutohedralParameter {
+  // The number of outputs for the layer.
+  optional uint32 num_output = 1;
+  // Defines the size of the filter in permutohedral space. Think of
+  // it as the size of a side of a squared convolutional filter.
+  optional uint32 neighborhood_size = 2;
+  // Filler used for the initial filter.
+  optional FillerParameter filter_filler = 3;
+  // Set this if you want that permutohedral blurs are initialized
+  // every forward step.
+  optional bool repeated_init = 4 [default = true];
+  optional uint32 group = 7 [default = 1];
+
+  // Bias term.
+  optional bool bias_term = 5 [default = false];
+  optional FillerParameter bias_filler = 6;
+
+  //Normalization norm_type:
+  // AFTER:     Normalize after filtering.
+  // SYMMETRIC: Normalize before and after filtering.
+  enum NormType {
+    AFTER = 0;
+    SYMMETRIC = 1;
+  }
+  optional NormType norm_type = 8 [default = SYMMETRIC];
+
+  //offset_type: FULL to use full Guassian offset.
+  //offset_type: DIAG to use diagonal offset.
+  //Use diagonal Gaussian option only when number of groups == 1
+  enum OffsetType {
+    FULL = 0;
+    DIAG = 1;
+    NONE = 2;
+  }
+  optional OffsetType offset_type = 9 [default = FULL];
+
+  // Whether to do filter visualization
+  // This option (true) will make barycetric weights uniform and
+  // output will be same for each lattice simplex points
+  optional bool visualize_lattice = 10 [default = false];
+
+  //Whether to skip filtering step. If true, only splat and
+  //slice operations will be performed in this layer
+  optional bool do_skip_blur = 11 [default = false];
+}
+
+// Message that stores parameters used by PixelFeatureLayer
+message PixelFeatureParameter {
+  enum Feature {
+    POSITION = 0;
+    POSITION_AND_RGB = 1;
+    RGB_AND_POSITION = 2;
+    RGB = 3;
+    RANDOM_POSITION = 4;
+    WARPED_POSITION = 5;
+    NUM_RANDOM_POSITION = 6;
+    RANDOM_ROTATE = 7;
+  }
+
+  optional Feature type = 1 [default = POSITION];
+  optional float rotation_angle = 2 [default = 0];
+  optional float pos_scale = 3 [default = 1];
+  optional float rotation_sigma = 4 [default = 1];
+  optional uint32 num_random_pos = 5;
+  optional float offset_h = 6 [default = 0];
+  optional float offset_w = 7 [default = 0];
+  optional float color_scale = 8 [default = 1];
 }
