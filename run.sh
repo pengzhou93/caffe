@@ -40,7 +40,7 @@ then
 
 elif [ "$1" = build ]
 then
-#   ./run.sh build rebuild
+#   ./run.sh build rebuild|runtest
     if [ "$2" = rebuild ]
     then
         make clean
