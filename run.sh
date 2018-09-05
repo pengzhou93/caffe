@@ -1,5 +1,9 @@
 #!/bin/bash
 
+debug_str="import pydevd;pydevd.settrace('localhost', port=8081, stdoutToServer=True, stderrToServer=True)"
+# pydevd module path
+export PYTHONPATH=/home/shhs/Desktop/user/soft/pycharm-2018.1.4/debug-eggs/pycharm-debug-py3k.egg_FILES
+
 insert_debug_string()
 {
     file=$1
@@ -32,22 +36,18 @@ delete_debug_string()
     fi
 }
 
-if [ "$1" = dependencies ]
-then
-    sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev protobuf-compiler
-    sudo apt-get install --no-install-recommends libboost-all-dev
-    sudo apt-get install libopenblas-dev
+build_caffe()
+{
+    rebuild=$1
+    runtest=$2
 
-elif [ "$1" = build ]
-then
-#   ./run.sh build rebuild|runtest
-    if [ "$2" = rebuild ]
+    if [ "$rebuild" = rebuild ]
     then
         make clean
     fi
 
 #   python3.6
-    source $HOME/anaconda3/bin/activate tf_1_6
+    source $HOME/anaconda3/bin/activate python3.5
 
 #   cuda, cudnn
     cudnn_path=/usr/local/cudnn_v5.1_cuda8.0
@@ -71,7 +71,7 @@ then
     make all -j8
     make pycaffe
 
-    if [ "$2" = runtest ]
+    if [ "$runtest" = runtest ]
     then
         make test -j8
         make runtest
@@ -83,5 +83,92 @@ then
     delete_debug_string Makefile 177 "$cudnn_lib"
     delete_debug_string Makefile 176 "$cudnn_include"
 
+}
+
+if [ "$1" = dependencies ]
+then
+    sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev protobuf-compiler
+    sudo apt-get install --no-install-recommends libboost-all-dev
+    sudo apt-get install libopenblas-dev
+
+elif [ "$1" = build ]
+then
+#   ./run.sh build norebuild runtest
+#   python: python3.5
+#   The version of python must be compatible with boost.
+    rebuild=$2
+    runtest=$3
+    build_caffe "$rebuild" "$runtest"
+
+elif [ "$1" = "examples/tile_segmentation/get_tile_data.py" ]
+then
+#   ./run.sh "examples/tile_segmentation/get_tile_data.py" norebuild debug
+    rebuild=$2
+    runtest=noruntest
+    build_caffe "$rebuild" "$runtest"
+
+    debug=$3
+    if [ $debug = debug ]
+    then
+        root_dir="examples/tile_segmentation"
+        cd $root_dir
+        file="get_tile_data.py"
+        line=3
+        insert_debug_string $file $line "$debug_str" $debug
+        python $file
+        delete_debug_string $file $line "$debug_str"
+    else
+        python get_tile_data.py
+    fi
+
+elif [ "$1" = "examples/tile_segmentation/bnn" ]
+then
+#   ./run.sh "examples/tile_segmentation/bnn" norebuild debug
+#   ./run.sh "examples/tile_segmentation/bnn" norebuild debug-cpp
+    rebuild=$2
+    runtest=noruntest
+    build_caffe "$rebuild" "$runtest"
+
+    root_dir="examples/tile_segmentation"
+    cd $root_dir
+    file="train.py"
+
+    debug=$3
+    if [ $debug = debug ]
+    then
+        line=1
+        insert_debug_string $file $line "$debug_str" $debug
+        python $file 1.0 bnn_train.prototxt snapshot_models/bnn_train
+        delete_debug_string $file $line "$debug_str"
+
+    elif [ $debug = debug-cpp ]
+    then
+        gdbserver localhost:8080 python $file 1.0 bnn_train.prototxt snapshot_models/bnn_train
+
+    else
+        python train.py 1.0 bnn_train.prototxt snapshot_models/bnn_train
+    fi
+
+elif [ "$1" = "examples/tile_segmentation/cnn" ]
+then
+#   ./run.sh "examples/tile_segmentation/cnn" norebuild debug
+    rebuild=$2
+    runtest=noruntest
+    build_caffe "$rebuild" "$runtest"
+
+    root_dir="examples/tile_segmentation"
+    cd $root_dir
+    file="train.py"
+
+    debug=$3
+    if [ $debug = debug ]
+    then
+        line=1
+        insert_debug_string $file $line "$debug_str" $debug
+        python $file 0.01 cnn_train.prototxt snapshot_models/cnn_train
+        delete_debug_string $file $line "$debug_str"
+    else
+        python train.py 0.01 cnn_train.prototxt snapshot_models/cnn_train
+    fi
 
 fi

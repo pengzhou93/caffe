@@ -40,7 +40,7 @@ class InputRead(caffe.Layer):
 
         self.num_images = NUM_DATA[self.data_type]
 
-        print 'Outputs:', self.top_names
+        print('Outputs:', self.top_names)
         if len(top) != len(self.top_names):
             raise Exception('Incorrect number of outputs (expected %d, got %d)' %
                             (len(self.top_names), len(top)))

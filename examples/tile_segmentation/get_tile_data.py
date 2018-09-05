@@ -28,12 +28,12 @@ def get_tile_data(num_images, rand_seed):
         tile_image = np.tile(fg_color, [tile_size, tile_size, 1])
 
         image = bg_image
-        image[rand_loc_row - tile_size / 2: rand_loc_row + tile_size / 2,
-              rand_loc_col - tile_size / 2: rand_loc_col + tile_size / 2, :]\
+        image[int(rand_loc_row - tile_size / 2): int(rand_loc_row + tile_size / 2),
+              int(rand_loc_col - tile_size / 2): int(rand_loc_col + tile_size / 2), :]\
             = tile_image
 
-        label_image[rand_loc_row - tile_size / 2: rand_loc_row + tile_size / 2,
-                    rand_loc_col - tile_size / 2: rand_loc_col + tile_size / 2]\
+        label_image[int(rand_loc_row - tile_size / 2): int(rand_loc_row + tile_size / 2),
+                    int(rand_loc_col - tile_size / 2): int(rand_loc_col + tile_size / 2)]\
             = 1
 
         noise_image = image + np.random.normal(0, noise_std, image.shape)
