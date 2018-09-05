@@ -100,26 +100,6 @@ then
     runtest=$3
     build_caffe "$rebuild" "$runtest"
 
-elif [ "$1" = "examples/tile_segmentation/get_tile_data.py" ]
-then
-#   ./run.sh "examples/tile_segmentation/get_tile_data.py" norebuild debug
-    rebuild=$2
-    runtest=noruntest
-    build_caffe "$rebuild" "$runtest"
-
-    debug=$3
-    if [ $debug = debug ]
-    then
-        root_dir="examples/tile_segmentation"
-        cd $root_dir
-        file="get_tile_data.py"
-        line=3
-        insert_debug_string $file $line "$debug_str" $debug
-        python $file
-        delete_debug_string $file $line "$debug_str"
-    else
-        python get_tile_data.py
-    fi
 
 elif [ "$1" = "examples/tile_segmentation/bnn" ]
 then
