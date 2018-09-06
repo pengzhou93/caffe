@@ -126,7 +126,7 @@ then
         gdbserver localhost:8080 python $file 1.0 bnn_train.prototxt snapshot_models/bnn_train
 
     else
-        python train.py 0.1 bnn_train.prototxt snapshot_models/bnn_train snapshot_models/bnn_train_iter_5000.caffemodel
+        python train.py 1 bnn_train.prototxt snapshot_models/bnn_train #snapshot_models/bnn_train_iter_5000.caffemodel
     fi
 
 elif [ "$1" = "examples/tile_segmentation/cnn" ]

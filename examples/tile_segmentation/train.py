@@ -12,7 +12,7 @@ def train(base_lr, train_prototxt, snapshot_prefix, init_model = None):
     test_iter = 10
     iter_size = 1
     test_interval = 50
-    num_iter = 5000
+    num_iter = 1000
     snapshot_iter = 50
     debug_info = False
 
