@@ -126,7 +126,7 @@ then
         gdbserver localhost:8080 python $file 1.0 bnn_train.prototxt snapshot_models/bnn_train
 
     else
-        python train.py 1.0 bnn_train.prototxt snapshot_models/bnn_train
+        python train.py 0.1 bnn_train.prototxt snapshot_models/bnn_train snapshot_models/bnn_train_iter_5000.caffemodel
     fi
 
 elif [ "$1" = "examples/tile_segmentation/cnn" ]
@@ -149,6 +149,28 @@ then
         delete_debug_string $file $line "$debug_str"
     else
         python train.py 0.01 cnn_train.prototxt snapshot_models/cnn_train
+    fi
+
+elif [ "$1" = "examples/tile_segmentation/test_and_plot.py" ]
+then
+#   ./run.sh "examples/tile_segmentation/test_and_plot.py" norebuild debug
+    rebuild=$2
+    runtest=noruntest
+    build_caffe "$rebuild" "$runtest"
+
+    root_dir="examples/tile_segmentation"
+    cd $root_dir
+    file="test_and_plot.py"
+
+    debug=$3
+    if [ $debug = debug ]
+    then
+        line=1
+        insert_debug_string $file $line "$debug_str" $debug
+        python $file
+        delete_debug_string $file $line "$debug_str"
+    else
+        python $file
     fi
 
 fi
